@@ -1,0 +1,25 @@
+{
+  "name": "tracker-backend",
+  "version": "1.0.0",
+  "description": "tracker의 백엔드 서버 프로젝트",
+  "main": "src/server.ts",
+  "author": "juyeong.park",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.1",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4",
+    "prisma": "^5.19.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "build": "tsc",
+    "dev": "nodemon src/server.ts --exec ts-node --delay 1"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.19.1"
+  }
+}
