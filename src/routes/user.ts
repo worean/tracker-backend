@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 
-const router = express.Router();
 interface User {
     id: string;
     name: string;
