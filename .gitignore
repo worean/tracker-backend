@@ -17,6 +17,7 @@ yarn-error.log*
 
 
 #prisma 
-prisma/migration/*
+prisma/migrations
 prisma/seeds/*
 prisma/dev.db
+prisma/dev.db-journal
