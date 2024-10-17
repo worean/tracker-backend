@@ -14,3 +14,9 @@ yarn-error.log*
 
 # local env files
 .env*.local
+
+
+#prisma 
+prisma/migration/*
+prisma/seeds/*
+prisma/dev.db
