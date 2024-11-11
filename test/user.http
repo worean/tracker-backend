@@ -1,0 +1,54 @@
+### 로그인
+POST http://localhost:4000/api/user/login
+Content-Type: application/json
+
+{
+    "email": "worean@naver.com",
+    "password": "1234"
+}
+
+### 회원 가입
+POST http://localhost:4000/api/user/register
+Content-Type: application/json
+
+{
+    "name": "박주영",
+    "email": "worean@naver.com",
+    "password": "1234"
+}
+### 회원 삭제
+DELETE http://localhost:4000/api/user/delete
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3Mjk4MzcxNjR9.UUR0yvhLiBqPHwh-VXoBMMkBeD-WB8nCnovFkisYpks
+
+{
+    "email": "worean@naver.com"
+}
+
+### Get user Request
+GET http://localhost:4000/api/user/1
+Content-Type: application/json
+
+{
+    "email": "worean@naver.com"
+}
+
+
+### Update user Request
+PUT http://localhost:4000/api/user/1
+Content-Type: application/json
+
+{
+    "name": "박주영",
+    "avatar": "https://avatars.githubusercontent.com/u/77464076?v=4",
+    "birthDate" :"1992-10-10"
+}
+
+
+### GET My Account Request
+GET http://localhost:4000/api/user/account
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3Mjk4MzcxNjR9.UUR0yvhLiBqPHwh-VXoBMMkBeD-WB8nCnovFkisYpks
+Content-Type: application/json
+
+{
+}

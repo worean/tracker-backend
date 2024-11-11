@@ -1,0 +1,47 @@
+
+### Update Project
+PUT http://localhost:4000/api/project/13
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3Mjk4MzcxNjR9.UUR0yvhLiBqPHwh-VXoBMMkBeD-WB8nCnovFkisYpks
+Content-Type: application/json
+
+{
+    "name": "수정 프로젝트"
+}
+
+
+
+### Create Project
+POST http://localhost:4000/api/project/create
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3Mjk4MzcxNjR9.UUR0yvhLiBqPHwh-VXoBMMkBeD-WB8nCnovFkisYpks
+Content-Type: application/json
+
+{
+    "name": "생성한 프로젝트",
+    "description": "8번째 프로젝트입니다."
+}
+
+
+### Delete Project
+DELETE http://localhost:4000/api/project/7
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3Mjk4MzcxNjR9.UUR0yvhLiBqPHwh-VXoBMMkBeD-WB8nCnovFkisYpks
+
+{
+    "projectId" : 1
+}
+
+### Get Project Request
+GET http://localhost:4000/api/project/10
+Content-Type: application/json
+
+{
+}
+
+
+### GET My Account Request
+GET http://localhost:4000/api/project/projects
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3Mjk4MzcxNjR9.UUR0yvhLiBqPHwh-VXoBMMkBeD-WB8nCnovFkisYpks
+Content-Type: application/json
+    
+{
+}

@@ -6,15 +6,16 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  name     String
-  password String
+  id       Int     @id @default(autoincrement())
+  email    String  @unique // 이메일
+  name     String // 이름
+  password String // 비밀번호
+  avatar   String? // 프로필 사진
 
   posts          Post[]
   managedIssues  Issue[]   @relation("IssueManager")
@@ -25,8 +26,9 @@ model User {
 
   projectsAsManager Project[] @relation("Manager")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  birthDate DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Post {
@@ -65,8 +67,11 @@ model Project {
 
 model Issue {
   id          Int     @id @default(autoincrement())
+  keyName     String // 이슈에 대한 키값 (ex. PROJECT-1) 
   summary     String
   description String?
+
+  priority Int @default(3) // 우선순위 (1: Lowest, 2: Low, 3: Medium, 4: High, 5: Highest)
 
   // 이슈의 타입 (버그, 기능, 개선, ...)
   issueTypeId Int
@@ -84,7 +89,7 @@ model Issue {
   reporterId Int?
   reporter   User? @relation("IssueReporter", fields: [reporterId], references: [id])
 
-  likes   Like[]
+  likes    Like[]
   comments Comment[]
   hashTags HashTag[] @relation("IssueHashTag")
 
@@ -150,15 +155,15 @@ model HashTag {
 }
 
 model Like {
-  id      Int    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  user  User  @relation(fields: [userId], references: [id])
-  userId  Int
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
 
-  issue Issue @relation(fields: [issueId], references: [id])
+  issue   Issue @relation(fields: [issueId], references: [id])
   issueId Int
 
-  comment Comment @relation(fields: [commentId], references: [id])
+  comment   Comment @relation(fields: [commentId], references: [id])
   commentId Int
 
   createdAt DateTime @default(now())

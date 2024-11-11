@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { getUser } from '../auth/auth';
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -35,10 +36,27 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 // POST /comments
 router.post('/', async (req: Request, res: Response) => {
+    var user = await getUser(req.headers.authorization!);
+    var issue = await prisma.issue.findUnique({
+        where: {
+            id: req.body.issueId
+        }
+    });
+
+    
+    if(user == null || issue == null) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
+
     const { text } = req.body;
     try {
         const comment = await prisma.comment.create({
-            data: { text },
+            data:{
+                content: text,
+                authorId: user!.id,
+                IssueId: issue!.id
+            },
         });
         res.json(comment);
     } catch (error) {
@@ -54,7 +72,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     try {
         const comment = await prisma.comment.update({
             where: { id: parseInt(id) },
-            data: { text },
+            data: { id: parseInt(id),content: text },
         });
         res.json(comment);
     } catch (error) {
