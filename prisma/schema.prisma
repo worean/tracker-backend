@@ -18,11 +18,14 @@ model User {
   avatar   String? // 프로필 사진
 
   posts          Post[]
-  managedIssues  Issue[]   @relation("IssueManager")
-  reportedIssues Issue[]   @relation("IssueReporter")
+  managedIssues  Issue[]        @relation("IssueManager")
+  reportedIssues Issue[]        @relation("IssueReporter")
   projects       Project[]
   comments       Comment[]
-  likes          Like[]
+  issueLikes     Issue_Like[]
+  commentLikes   Comment_Like[]
+  chats          Chat[]
+  chatMessages   Chat_Message[]
 
   projectsAsManager Project[] @relation("Manager")
 
@@ -89,9 +92,9 @@ model Issue {
   reporterId Int?
   reporter   User? @relation("IssueReporter", fields: [reporterId], references: [id])
 
-  likes    Like[]
+  likes    Issue_Like[]
   comments Comment[]
-  hashTags HashTag[] @relation("IssueHashTag")
+  hashTags HashTag[]    @relation("IssueHashTag")
 
   startDate DateTime?
   endDate   DateTime?
@@ -140,32 +143,96 @@ model Comment {
   IssueId Int
   Issue   Issue @relation(fields: [IssueId], references: [id])
 
-  likes Like[]
+  likes Comment_Like[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// 해쉬태그 모델
 model HashTag {
   id   Int    @id @default(autoincrement())
-  name String
+  name String @unique// 해쉬태그 이름
 
-  issues   Issue[]   @relation("IssueHashTag")
-  projects Project[] @relation("ProjectHashTag")
+  issues   Issue[]   @relation("IssueHashTag") // 해당 해쉬태그를 가지고 있는 이슈들
+  projects Project[] @relation("ProjectHashTag") // 해당 해쉬태그를 가지고 있는 프로젝트들
 }
 
-model Like {
+// 이슈에 대한 '좋아요' 모델
+model Issue_Like {
   id Int @id @default(autoincrement())
+
+  issue   Issue? @relation(fields: [issueId], references: [id])
+  issueId Int?
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
-  issue   Issue @relation(fields: [issueId], references: [id])
-  issueId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 코멘트에 대한 '좋아요' 모델
+model Comment_Like {
+  id Int @id @default(autoincrement())
 
   comment   Comment @relation(fields: [commentId], references: [id])
   commentId Int
 
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// 사용자들 간의 채팅방 모델
+model Chat {
+  id Int @id @default(autoincrement())
+
+  // 채팅방에 참여하는 사용자들
+  users User[]
+
+  // 채팅방에 속한 메시지들
+  messages Chat_Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 사용자들이 채팅방에서 작성한 메시지 모델
+model Chat_Message {
+  id Int @id @default(autoincrement())
+
+  // 메시지를 보낸 사용자
+  senderId Int
+  sender User @relation(fields: [senderId], references: [id])
+
+  // 메시지가 속한 채팅방
+  chatId Int
+  chat Chat @relation(fields: [chatId], references: [id])
+
+  // 메시지 내용
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model Chat_Message_React {
+//   id Int @id @default(autoincrement())
+
+//   // 리액션을 보낸 사용자
+//   userId Int
+//   user User @relation(fields: [userId], references: [id])
+
+//   // 리액션을 보낸 메시지
+//   messageId Int
+//   message Chat_Message @relation(fields: [messageId], references: [id])
+
+//   // 리액션 타입
+//   type String
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }

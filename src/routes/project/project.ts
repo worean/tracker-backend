@@ -1,7 +1,7 @@
 import express, { Router, Request, Response } from 'express';
-import prisma from '../client';
+import prisma from '../../client';
 import { PrismaClient, User } from '@prisma/client';
-import { AuthFunction, GetLoginedUser, getUser, UserAuthFunction } from '../auth/auth';
+import { AuthFunction, GetLoginedUser, getUser, UserAuthFunction } from '../../utils/auth';
 
 const router = express.Router();
 
@@ -14,7 +14,6 @@ interface Project {
     startDate: string;
     endDate: string;
 }
-
 
 // 내가 가지고 있는 프로젝트들을 조회한다.
 router.get('/projects', async (req: Request, res: Response) => {
@@ -153,8 +152,8 @@ router.delete('/:id', UserAuthFunction(async (req: Request, res: Response, user:
         }
     });
 
-
-    res.status(200).send(`${JSON.stringify(ret)}`);
+    // 삭제되었다면 No Content를 반환한다.
+    res.status(204);
 }));
 
 router.put('/:id', UserAuthFunction(async (req: Request, res: Response, user: User) => {
@@ -198,7 +197,5 @@ router.put('/:id', UserAuthFunction(async (req: Request, res: Response, user: Us
 
     res.status(200).send(`${JSON.stringify(ret)}`);
 }));
-
-
 
 export default router;

@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import prisma from '../client';
-import auth, { GetLoginedUser } from '../auth/auth';
+import prisma from '../../client';
+import auth, { GetLoginedUser } from '../../utils/auth';
 import bcrypt from 'bcrypt';
 
 interface User {
@@ -134,7 +134,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     });
 
     // 삭제된 user를 반환한다.
-    res.status(200).send({ message: 'deleted', result: deletedUser });
+    res.status(204).send({ message: 'deleted', result: deletedUser });
 });
 
 // 유저를 등록한다.

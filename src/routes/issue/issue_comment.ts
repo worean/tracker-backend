@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
-import { GetLoginedUser, UserAuthFunction } from '../auth/auth';
-import prisma from '../client';
+import { GetLoginedUser, UserAuthFunction } from '../../utils/auth';
+import prisma from '../../client';
 import { User } from '@prisma/client';
+
 interface Comment {
     id: number;
     issueId: number;
@@ -30,7 +31,7 @@ router.get('/:issueId/comments', async (req: Request, res: Response) => {
 });
 
 // 특정 코멘트를 가져온다.
-router.get('/:commentId', async (req: Request, res: Response) => {
+router.get('/:issueId/:commentId', async (req: Request, res: Response) => {
     const commentId = parseInt(req.params.commentId);
 
     // 특정 코멘트를 가져온다.
@@ -54,12 +55,12 @@ router.post('/:issueId/comment/create', async (req: Request, res: Response) => {
         return;
     }
 
-    
+
     const { content } = req.body;
     if (content == null || content == '') {
         res.status(400).json({ error: 'Invalid request' });
     }
-    
+
     // issueId를 통해서 issue를 찾는다.
     const issueId = parseInt(req.params.issueId);
     var issue = await prisma.issue.findUnique({
@@ -86,7 +87,7 @@ router.post('/:issueId/comment/create', async (req: Request, res: Response) => {
 });
 
 // 코멘트의 정보를 수정한다.
-router.put('/comment/:commentId', UserAuthFunction(async (req: Request, res: Response) => {
+router.put('/:issueId/comment/:commentId',async (req: Request, res: Response) => {
     const commentId = parseInt(req.params.commentId);
     var comment = await prisma.comment.findUnique({
         where: {
@@ -111,15 +112,23 @@ router.put('/comment/:commentId', UserAuthFunction(async (req: Request, res: Res
     else {
         res.status(404).json({ error: 'Comment not found' });
     }
-}));
+});
 
 // 특정 Issue에 연결된 코멘트를 삭제한다.
-router.delete('/:issueId/comments/:commentId', UserAuthFunction(async (req: Request, res: Response, user: User) => {
+router.delete('/:issueId/comment/:commentId', async (req: Request, res: Response) => {
     const commentId = parseInt(req.params.commentId);
+    const issueId = parseInt(req.params.issueId);
+
+    var user = await GetLoginedUser(req);
+    if(user == null) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+    }
 
     var ret = await prisma.comment.delete({
         where: {
             id: commentId,
+            IssueId : issueId,
             authorId: user.id
         }
     });
@@ -128,6 +137,6 @@ router.delete('/:issueId/comments/:commentId', UserAuthFunction(async (req: Requ
     }
 
     res.status(204).json(ret);
-}));
+});
 
 export default router;
