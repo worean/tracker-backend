@@ -1,11 +1,11 @@
-import { Router, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import prisma from '../../client';
 import { GetLoginedUser } from '../../utils/auth';
 import issue_like from './issue_like';
 import issue_comment from './issue_comment';
 import hashtag from '../../utils/hashtag';
 
-const router = Router();
+const router = express.Router();
 
 // 이슈 처리를 위한 interface 
 interface Issue {
@@ -17,7 +17,6 @@ interface Issue {
     priority: number;
     keyName: string;
     status: number;
-
 }
 
 // 이슈중에 특정 ID를 가진 이슈를 조회한다.
@@ -40,15 +39,24 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post('/create', async (req: Request, res: Response) => {
     // 현재 로그인된 사용자를 가져온다.
     const user = await GetLoginedUser(req);
-    if (user == null || user.id == null) {
+    if (user == null) {
         res.status(401).json({ error: 'Unauthorized' });
         return;
     }
 
+    // Request에서 이슈 정보를 가져온다.
     let info: Issue = req.body;
     if (info == null) {
         res.status(400).json({ error: 'Invalid request' });
     }
+
+    const issueType = await prisma.issueType.findUnique({
+        where: { id: info.issueTypeId }
+    });
+    const project = await prisma.project.findUnique({
+        where: { id: info.projectId }
+    });
+
 
     // 이슈를 생성한다.
     const issue = await prisma.issue.create({
@@ -56,8 +64,16 @@ router.post('/create', async (req: Request, res: Response) => {
             summary: info.summary,
             keyName: info.keyName ? info.keyName : 'ISSUE-1',
             description: info.description,
-            issueTypeId: info.issueTypeId,
-            projectId: info.projectId
+            issueType: {
+                connect: {
+                    id: info.issueTypeId
+                }
+            },
+            project: {
+                connect: {
+                    id: info.projectId
+                }
+            },
         }
     });
 
@@ -106,13 +122,22 @@ router.put('/:issueId', async (req: Request, res: Response) => {
         return;
     }
 
+    // 받은 데이터를 기반으로 issueType을 찾는다.
+    let issueType = await prisma.issueType.findUnique({
+        where: { id: req_issue.issueTypeId }
+    });
+
     // 이슈를 업데이트한다.
     issue = await prisma.issue.update({
         where: { id: Number(issueId) },
         data: {
             summary: req_issue.summary ? req_issue.summary : issue.summary,
             description: req_issue.description ? req_issue.description : issue.description,
-            issueTypeId: req_issue.issueTypeId ? req_issue.issueTypeId : issue.issueTypeId,
+            issueType: issueType ? {
+                connect: {
+                    id: req_issue.issueTypeId ? req_issue.issueTypeId : issue.issueTypeId
+                }
+            } : undefined,
         },
     });
 

@@ -1,7 +1,6 @@
-import express, { Router, Request, Response } from 'express';
+import express, {Request, Response } from 'express';
 import prisma from '../../client';
-import { PrismaClient, User } from '@prisma/client';
-import { AuthFunction, GetLoginedUser, getUser, UserAuthFunction } from '../../utils/auth';
+import { GetLoginedUser } from '../../utils/auth';
 
 const router = express.Router();
 
@@ -95,7 +94,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // 프로젝트를 생성한다.
-router.post('/create', UserAuthFunction(async (req: Request, res: Response, user: User) => {
+router.post('/create', async (req: Request, res: Response) => {
 
     // Request에서 project 정보를 가져온다.
     var project: Project = req.body;
@@ -105,23 +104,37 @@ router.post('/create', UserAuthFunction(async (req: Request, res: Response, user
         return res.status(400).send('Invalid project data');
     }
 
+    var user = await GetLoginedUser(req);
+    if (user == null) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
+
     // project를 생성한다.
     var ret = await prisma.project.create({
         data: {
             name: project.name,
             description: project.description,
-            managerId: user.id,
-            iconId: project.iconId ? project.iconId : null,
+            Icon: {
+                connect: {
+                    id: project.iconId
+                }
+            },
             startDate: project.startDate ? project.startDate : null,
-        },
+            manager: {
+                connect: {
+                    id: user.id
+                },
+            },
+        }
     });
 
     // project 정보를 반환한다.
     res.status(201).send(`${JSON.stringify(ret)}`);
-}));
+});
 
 // 내 계정에 속한 프로젝트 중 특정 프로젝트를 삭제한다.
-router.delete('/:id', UserAuthFunction(async (req: Request, res: Response, user: User) => {
+router.delete('/:id', async (req: Request, res: Response) => {
     // project id를 받는다.
     var projectId = parseInt(req.params.id);
 
@@ -129,6 +142,14 @@ router.delete('/:id', UserAuthFunction(async (req: Request, res: Response, user:
         res.status(400).send('Invalid project id');
         return;
     }
+
+
+    var user = await GetLoginedUser(req);
+    if (user == null) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
+
 
     // project id로 project를 찾는다.
     var project = await prisma.project.findUnique({
@@ -154,14 +175,23 @@ router.delete('/:id', UserAuthFunction(async (req: Request, res: Response, user:
 
     // 삭제되었다면 No Content를 반환한다.
     res.status(204);
-}));
+});
 
-router.put('/:id', UserAuthFunction(async (req: Request, res: Response, user: User) => {
+// 내 계정에 속한 프로젝트 중 특정 프로젝트를 수정한다.
+router.put('/:id', async (req: Request, res: Response) => {
     // project id를 받는다.
     var projectId = parseInt(req.params.id);
+    var newData: Project = req.body;
 
-    if (projectId == null) {
+    if (projectId == null || isNaN(projectId)) {
         res.status(400).send('Invalid project id');
+        return
+    }
+
+    // 현재 로그인된 사용자를 가져온다.
+    var user = await GetLoginedUser(req);
+    if (user == null) {
+        res.status(401).send('Unauthorized');
         return;
     }
 
@@ -173,13 +203,18 @@ router.put('/:id', UserAuthFunction(async (req: Request, res: Response, user: Us
         }
     });
 
-    var newData: Project = req.body;
-
     // project를 찾지 못했다면 에러를 반환한다.
     if (!project) {
         res.status(404).send('Project not found or you do not have permission to update this project');
         return;
     }
+
+    // icon 을 찾는다.
+    var icon = await prisma.icon.findUnique({
+        where: {
+            id: newData.iconId
+        }
+    });
 
     // project 정보를 업데이트한다.
     var ret = await prisma.project.update({
@@ -187,15 +222,28 @@ router.put('/:id', UserAuthFunction(async (req: Request, res: Response, user: Us
             id: projectId,
         },
         data: {
-            name: newData.name? newData.name : project.name,
-            description: newData.description? newData.description : project.description,
-            iconId: newData.iconId ? newData.iconId : project.iconId,
+            name: newData.name ? newData.name : project.name,
+            description: newData.description ? newData.description : project.description,
             startDate: newData.startDate ? new Date(newData.startDate) : project.startDate,
-            endDate: newData.endDate ? new Date(newData.endDate) : project.endDate
+            endDate: newData.endDate ? new Date(newData.endDate) : project.endDate,
+
+            // 해당 프로젝트의 아이콘의 경우 관계형 데이터베이스 업데이트를 진행한다.
+            Icon: icon ? {
+                connect: {
+                    id: newData.iconId ? newData.iconId : (project.iconId ? project.iconId : undefined)
+                }
+            } : undefined,
+
+            // 해당 프로젝트의 매니저의 경우 관계형 데이터베이스 업데이트를 진행한다.
+            manager: user ? {
+                connect: {
+                    id: newData.managerId ? newData.managerId : project.managerId
+                }
+            } : undefined
         }
     });
 
     res.status(200).send(`${JSON.stringify(ret)}`);
-}));
+});
 
 export default router;

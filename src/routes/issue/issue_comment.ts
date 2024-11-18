@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
-import { GetLoginedUser, UserAuthFunction } from '../../utils/auth';
+import { GetLoginedUser } from '../../utils/auth';
 import prisma from '../../client';
-import { User } from '@prisma/client';
 
 interface Comment {
     id: number;
@@ -87,7 +86,7 @@ router.post('/:issueId/comment/create', async (req: Request, res: Response) => {
 });
 
 // 코멘트의 정보를 수정한다.
-router.put('/:issueId/comment/:commentId',async (req: Request, res: Response) => {
+router.put('/:issueId/comment/:commentId', async (req: Request, res: Response) => {
     const commentId = parseInt(req.params.commentId);
     var comment = await prisma.comment.findUnique({
         where: {
@@ -120,7 +119,7 @@ router.delete('/:issueId/comment/:commentId', async (req: Request, res: Response
     const issueId = parseInt(req.params.issueId);
 
     var user = await GetLoginedUser(req);
-    if(user == null) {
+    if (user == null) {
         res.status(401).json({ error: 'Unauthorized' });
         return;
     }
@@ -128,7 +127,7 @@ router.delete('/:issueId/comment/:commentId', async (req: Request, res: Response
     var ret = await prisma.comment.delete({
         where: {
             id: commentId,
-            IssueId : issueId,
+            IssueId: issueId,
             authorId: user.id
         }
     });

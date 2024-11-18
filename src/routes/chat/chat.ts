@@ -19,9 +19,9 @@ router.get('/:chatId/messages', async (req: Request, res: Response) => {
     var messages = await prisma.chat_Message.findMany({
         where: {
             chatId,
-            chat:{
-                users:{
-                    some:{
+            chat: {
+                users: {
+                    some: {
                         id: user.id
                     }
                 }
@@ -51,10 +51,10 @@ router.get('/:chatId/message/:messageId', async (req: Request, res: Response) =>
     var message = await prisma.chat_Message.findUnique({
         where: {
             id: messageId,
-            chat : {
+            chat: {
                 id: chatId,
-                users:{
-                    some:{
+                users: {
+                    some: {
                         id: user.id
                     }
                 }
