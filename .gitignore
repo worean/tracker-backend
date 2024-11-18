@@ -21,3 +21,6 @@ prisma/migrations
 prisma/seeds/*
 prisma/dev.db
 prisma/dev.db-journal
+
+# Mac OS finder
+*/.DS_Store
