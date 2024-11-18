@@ -106,18 +106,18 @@ model Issue {
 
 model IssueType {
   id   Int    @id @default(autoincrement())
-  name String
+  name String // 이슈 타입 이름
 
-  iconId Int
+  iconId Int  // 아이콘 ID
   icon   Icon @relation(fields: [iconId], references: [id])
 
-  Issue Issue[]
+  Issue Issue[] // 이 이슈 타입을 가지고 있는 이슈들
 }
 
 model Icon {
   id   Int    @id @default(autoincrement())
-  name String
-  uri  String
+  name String   // 아이콘 이름
+  uri  String   // 아이콘 이미지의 URI
 
   Project   Project[]
   IssueType IssueType[]
