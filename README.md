@@ -7,6 +7,6 @@ REST API 를 지원하는 서버이다.
 
 ```
 git clone https://github.com/worean/tracker-backend.git
-cd tracker-backend && yarn add
-yarn run dev
+cd tracker-backend && yarn install
+yarn dev
 ```
