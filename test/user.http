@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ### GET My Account Request
 GET http://localhost:4000/api/user/account
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3Mjk4MzcxNjR9.UUR0yvhLiBqPHwh-VXoBMMkBeD-WB8nCnovFkisYpks
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IndvcmVhbkBuYXZlci5jb20iLCJpYXQiOjE3MzI1NTM0MDN9.pFazAXZpNYblEUbJYljSqWAG4XzUuJonvp_2_zP4xjY
 Content-Type: application/json
 
 {

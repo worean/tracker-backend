@@ -7,7 +7,12 @@ import issue from "./routes/issue/issue";
 import project from "./routes/project/project";
 import chat from "./routes/chat/chat";
 
+var cors = require('cors');
+
 const router = express.Router();
+
+// CORS 설정을 추가한다.
+router.use(cors())
 
 // json UTF-8 parsing을 위해서 body-parser를 사용한다.
 router.use(bodyParser.json());
@@ -18,5 +23,6 @@ router.use('/user', user);
 router.use('/issue', issue);
 router.use('/project', project);
 router.use('/chat', chat)
+
 
 export default router;

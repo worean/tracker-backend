@@ -170,9 +170,8 @@ router.post('/register', async (req: Request, res: Response) => {
 // 로그인을 시도한다.
 router.post('/login', async (req: Request, res: Response) => {
     var info: register = req.body;
-
     // 로그인을 시고한다.
-    auth.login(info.email, info.password).then((ret) => {
+    var ret = await auth.login(info.email, info.password).then((ret) => {
         if (ret == "User not found") {
             res.status(404).json({ message: 'User not found' });
         }
@@ -183,6 +182,7 @@ router.post('/login', async (req: Request, res: Response) => {
             res.status(200).json({ message: 'login success', result: ret });
         }
     });
+    console.log(res.statusCode);
 });
 
 
